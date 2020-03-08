@@ -107,9 +107,21 @@ fn main() {
         ]
     ]};
 
-    println!("\n== DEBUG OUTPUT ==");
-    println!("{:?}", sudoku);
-
     println!("\n== PRETTY OUTPUT ==");
     println!("{}", sudoku);
+
+    println!("\n== ROWS ==");
+    for i in 0..9 {
+        println!("{}", sudoku.row(i).is_valid());
+    }
+
+    println!("\n== COLUMNS ==");
+    for i in 0..9 {
+        println!("{}", sudoku.column(i).is_valid());
+    }
+
+    println!("\n== SQUARES ==");
+    for i in 0..9 {
+        println!("{}", sudoku.square(i).is_valid());
+    }
 }
