@@ -1,17 +1,17 @@
 use std::fmt;
 use std::collections::HashSet;
-use arr_macro::arr;
 
 // A single cell
 pub struct Cell {
-    digit: Option<u8>
+    digit: Option<u8>,
+    posibilities: HashSet<u8>
 }
 
 impl Cell {
-    fn only_possibility(&self) -> HashSet<u8>{
-        //[self.digit.unwrap()].iter().cloned().collect()
-        HashSet::new()
-    }
+
+    // fn only_possibility(&self) -> HashSet<u8>{
+    //     [self.digit.unwrap()].iter().cloned().collect()
+    // }
 
     fn to_int(&self) -> u8 {
         match self.digit {
@@ -23,8 +23,7 @@ impl Cell {
 
 // A full Sudoku grid of 9x9
 pub struct Sudoku {
-    cells: [Cell; 81],
-    posibilities: [HashSet<u8>; 81]
+    cells: [Cell; 81]
 }
 
 impl Sudoku {
@@ -61,7 +60,7 @@ impl Sudoku {
 
         for cell_index in cell_indexes {
             for digit in &taken_digits {
-                self.posibilities[cell_index].remove(&digit);
+                self.cells[cell_index].posibilities.remove(&digit);
             }
         }
     }
@@ -81,24 +80,11 @@ impl Sudoku {
         for square_number in 0..9 {
             self.restrict_indexes(self.square_indexes(square_number));
         }
-
-        // Find non empty cells
-        let active_cells = self.cells.iter()
-            .enumerate()
-            .filter(|(_, cell)| cell.digit.is_some());
-
-        // Set only posibility for any non empty cells
-        for (cell_index, cell) in active_cells {
-            self.posibilities[cell_index] = cell.only_possibility();
-        }
     }
 
     pub fn debug_posibilities(&self) {
-        for (cell_index, posibilities) in self.posibilities.iter().enumerate() {
-            println!("{:?}", posibilities);
-            if cell_index % 9 == 8 {
-                println!("\n");
-            }
+        for cell in self.cells.iter() {
+            println!("{:?}", cell.posibilities);
         }
     }
 }
@@ -147,21 +133,15 @@ impl fmt::Display for Sudoku {
 }
 
 pub fn build_cell(input: &str) -> Cell {
-    let result = input.parse::<u8>();
-    match result {
-        Ok(value) => Cell {digit: Some(value)},
-        _ => Cell {digit: None}
+    match input.parse::<u8>() {
+        Ok(value) => Cell {digit: Some(value), posibilities: HashSet::new()},
+        _ => Cell {digit: None, posibilities: (1..=9).collect()}
     }
-}
-
-fn build_posibilities() -> [HashSet<u8>; 81] {
-    arr![(1..=9).collect(); 81]
 }
 
 pub fn build_sudoku(cells: [Cell; 81]) -> Sudoku {
     let mut sudoku = Sudoku {
-        cells: cells,
-        posibilities: build_posibilities()
+        cells: cells
     };
     sudoku.restrict();
     return sudoku
