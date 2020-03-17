@@ -9,9 +9,18 @@ pub struct Cell {
 
 impl Cell {
 
-    // fn only_possibility(&self) -> HashSet<u8>{
-    //     [self.digit.unwrap()].iter().cloned().collect()
-    // }
+    pub fn new(character: char) -> Cell {
+        match character.to_digit(10) {
+            Some(value) => Cell {
+                digit: Some(value as u8),
+                posibilities: HashSet::new()
+            },
+            _ => Cell {
+                digit: None,
+                posibilities: (1..=9).collect()
+            }
+        }
+    }
 
     fn to_int(&self) -> u8 {
         match self.digit {
@@ -27,6 +36,14 @@ pub struct Sudoku {
 }
 
 impl Sudoku {
+
+    pub fn new(cells: [Cell; 81]) -> Sudoku {
+        let mut sudoku = Sudoku {
+            cells: cells,
+        };
+        sudoku.restrict();
+        return sudoku
+    }
 
     fn index(row_number: usize, column_number: usize) -> usize {
         (row_number * 9) + column_number
@@ -130,21 +147,6 @@ impl fmt::Display for Sudoku {
 
         Ok(())
     }
-}
-
-pub fn build_cell(input: &str) -> Cell {
-    match input.parse::<u8>() {
-        Ok(value) => Cell {digit: Some(value), posibilities: HashSet::new()},
-        _ => Cell {digit: None, posibilities: (1..=9).collect()}
-    }
-}
-
-pub fn build_sudoku(cells: [Cell; 81]) -> Sudoku {
-    let mut sudoku = Sudoku {
-        cells: cells
-    };
-    sudoku.restrict();
-    return sudoku
 }
 
 #[cfg(test)]
